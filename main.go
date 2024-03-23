@@ -17,7 +17,7 @@ const (
 	gridColSize = 6
 )
 
-var playerStartPos = Vector{float64(screenX / 2) + 50, float64(screenY / 2) + 50}
+var playerStartPos = Vector{float64(screenX/2) + 50, float64(screenY/2) + 50}
 var enemyStartPos = Vector{float64(screenX / 2), float64(screenY / 2)}
 
 var ship Player
@@ -29,6 +29,7 @@ var world Vector = Vector{
 	X: screenX,
 	Y: screenY,
 }
+
 type Game struct {
 }
 
@@ -46,7 +47,7 @@ func (g *Game) Update() error {
 	for _, s := range spaces {
 		ship.SpacePosition(s)
 		enemy.SpacePosition(s)
-		for _, b := range ship.bullets{
+		for _, b := range ship.bullets {
 			b.SpacePosition(s)
 		}
 	}
@@ -57,18 +58,18 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	// So basically wo i put items we want to draw on the sreen in this area and
 	// the items are drawn in a desecding order as they are placed
-//	drawGrid(screen, gridRowSize, gridColSize)
+	//	drawGrid(screen, gridRowSize, gridColSize)
 	for _, b := range ship.bullets {
 		b.Draw(screen)
 	}
 
-//	for _, s := range spaces {
-//		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("POS: %v, %v", s.Position.X, s.Position.Y), int(s.Position.X), int(s.Position.Y))
-//	}
+	//	for _, s := range spaces {
+	//		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("POS: %v, %v", s.Position.X, s.Position.Y), int(s.Position.X), int(s.Position.Y))
+	//	}
 
 	//	vector.StrokeLine(screen, float32(ship.center().X), float32(ship.center().Y), float32(ship.center().X + 4), float32(ship.center().Y), 4, color.White, false)
 
-//	drawPosition(screen, spaces, &ship.GameObjectModel)
+	//	drawPosition(screen, spaces, &ship.GameObjectModel)
 	ship.checkCollision(ship.drawBounds)
 	ship.Draw(screen)
 	enemy.Draw(screen)
@@ -96,9 +97,6 @@ func main() {
 	enemy.Name = "Enemy"
 	enemy.SetPosition(enemyStartPos.X, enemyStartPos.Y)
 	enemy.bullet.Sprite = PlayerBulletSprite
-
-
-	
 
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
@@ -146,7 +144,7 @@ func setSpacePartition(worldSize Vector, row, col int) []Space {
 					Position: position,
 					Size:     size,
 					index:    i,
-					objects: make(map[string]*GameObjectModel),
+					objects:  make(map[string]*GameObjectModel),
 				}
 				i++
 			}
@@ -158,7 +156,7 @@ func setSpacePartition(worldSize Vector, row, col int) []Space {
 
 func drawPosition(screen *ebiten.Image, spaces []Space, object *GameObjectModel) {
 	for _, s := range spaces {
-		if ok, _ := isOverlapping(object, s); ok{
+		if ok, _ := isOverlapping(object, s); ok {
 			vector.DrawFilledRect(screen, float32(s.Position.X), float32(s.Position.Y), float32(s.Size.X), float32(s.Size.Y), color.White, false)
 		}
 	}
@@ -166,29 +164,27 @@ func drawPosition(screen *ebiten.Image, spaces []Space, object *GameObjectModel)
 
 //func setObjectsInSpace(spaces []Space)
 
-func isOverlapping(gom *GameObjectModel, s Space ) (bool,  *Space){
-	if gom.GetCenter().X <= (s.Position.X+s.Size.X) && gom.GetCenter().X >= s.Position.X || 
-	 	(gom.GetCenter().X + float64(gom.Sprite.Bounds().Dx())) <= (s.Position.X + s.Size.X) && (gom.GetCenter().X + float64(gom.Sprite.Bounds().Dx()) >= s.Position.X){
-			if gom.GetCenter().Y  >= s.Position.Y && gom.GetCenter().Y  <= (s.Position.Y+s.Size.Y) ||  
-				(gom.GetCenter().Y + float64(gom.Sprite.Bounds().Dy())) <= (s.Position.Y + s.Size.Y) && (gom.GetCenter().Y + float64(gom.Sprite.Bounds().Dy()) >= s.Position.Y){
-					return true, &s
-				}
-	
+func isOverlapping(gom *GameObjectModel, s Space) (bool, *Space) {
+	if gom.GetCenter().X <= (s.Position.X+s.Size.X) && gom.GetCenter().X >= s.Position.X ||
+		(gom.GetCenter().X+float64(gom.Sprite.Bounds().Dx())) <= (s.Position.X+s.Size.X) && (gom.GetCenter().X+float64(gom.Sprite.Bounds().Dx()) >= s.Position.X) {
+		if gom.GetCenter().Y >= s.Position.Y && gom.GetCenter().Y <= (s.Position.Y+s.Size.Y) ||
+			(gom.GetCenter().Y+float64(gom.Sprite.Bounds().Dy())) <= (s.Position.Y+s.Size.Y) && (gom.GetCenter().Y+float64(gom.Sprite.Bounds().Dy()) >= s.Position.Y) {
+			return true, &s
+		}
+
 	}
 	return false, &s
 }
 
-func isColliding(a, b *GameObjectModel) bool{
-	if (a.Position.X + float64(a.Sprite.Bounds().Dx())) <= (b.Position.X + float64(b.Sprite.Bounds().Dx())) || 
-	 	(a.Position.X + float64(a.Sprite.Bounds().Dx())) <= (b.Position.X + float64(b.Sprite.Bounds().Dx())) && (a.GetCenter().X + float64(a.Sprite.Bounds().Dx()) >= b.Position.X){
-			if a.Position.Y  >= b.Position.Y && a.Position.Y  <= (b.Position.Y+ float64(b.Sprite.Bounds().Dy())) ||  
-				(a.Position.Y + float64(a.Sprite.Bounds().Dy())) <= (b.Position.Y + float64(b.Sprite.Bounds().Dy())) && (a.Position.Y + float64(a.Sprite.Bounds().Dy()) >= b.Position.Y){
-					return true
-				}
-	
+func isColliding(a, b *GameObjectModel) bool {
+	if (a.Position.X+float64(a.Sprite.Bounds().Dx())) <= (b.Position.X+float64(b.Sprite.Bounds().Dx())) ||
+		(a.Position.X+float64(a.Sprite.Bounds().Dx())) <= (b.Position.X+float64(b.Sprite.Bounds().Dx())) && (a.GetCenter().X+float64(a.Sprite.Bounds().Dx()) >= b.Position.X) {
+		if a.Position.Y >= b.Position.Y && a.Position.Y <= (b.Position.Y+float64(b.Sprite.Bounds().Dy())) ||
+			(a.Position.Y+float64(a.Sprite.Bounds().Dy())) <= (b.Position.Y+float64(b.Sprite.Bounds().Dy())) && (a.Position.Y+float64(a.Sprite.Bounds().Dy()) >= b.Position.Y) {
+			return true
+		}
+
 	}
 	return false
 
 }
-
-

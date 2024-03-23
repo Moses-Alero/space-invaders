@@ -19,9 +19,9 @@ type GameObject interface {
 }
 
 type GameObjectModel struct {
-	Name     string
-	Position Vector
-	Sprite   *ebiten.Image
+	Name              string
+	Position          Vector
+	Sprite            *ebiten.Image
 	currentWorldSpace Space
 }
 
@@ -32,46 +32,45 @@ func (gom *GameObjectModel) GetPosition() Vector {
 	return gom.Position
 }
 
-func (gom *GameObjectModel) GetSize() Vector{
+func (gom *GameObjectModel) GetSize() Vector {
 	return Vector{
 		X: float64(gom.Sprite.Bounds().Dx()),
 		Y: float64(gom.Sprite.Bounds().Dy()),
 	}
 }
 
-func (gom *GameObjectModel) SpacePosition(s Space){
+func (gom *GameObjectModel) SpacePosition(s Space) {
 	overlap, space := isOverlapping(gom, s)
-	if  overlap{
+	if overlap {
 		gom.currentWorldSpace = *space
 		space.objects[gom.Name] = gom
-	}else if !overlap{
-		//check if player was in space then remove player from space	
-		if _, ok := space.objects[gom.Name]; ok{
+	} else if !overlap {
+		//check if player was in space then remove player from space
+		if _, ok := space.objects[gom.Name]; ok {
 			delete(space.objects, gom.Name)
 		}
 	}
 }
 
-func (gom *GameObjectModel) checkCollision(cb func()){
+func (gom *GameObjectModel) checkCollision(cb func()) {
 	if len(gom.currentWorldSpace.objects) < 2 {
 		return
 	}
-	for _, object := range gom.currentWorldSpace.objects{
-		if object != gom{
-			if isColliding(gom, object){
+	for _, object := range gom.currentWorldSpace.objects {
+		if object != gom {
+			if isColliding(gom, object) {
 				fmt.Println("Collision detected")
 				cb()
-			}else{
+			} else {
 				return
 			}
-		} 
-	} 
+		}
+	}
 }
 
-func (gom *GameObjectModel) drawBounds(){
-	drawGrid(gom.Sprite, 2,2)		
+func (gom *GameObjectModel) drawBounds() {
+	drawGrid(gom.Sprite, 2, 2)
 }
-
 
 func (gom *GameObjectModel) GetCenter() Vector {
 	return Vector{
@@ -123,7 +122,6 @@ func (p *Player) movement() {
 	p.Position.Y += delta.Y
 
 }
-
 
 func (p *Player) attack() {
 	p.attackTimer.Update()
@@ -215,7 +213,6 @@ func (e *Enemy) Draw(screen *ebiten.Image) {
 	screen.DrawImage(e.Sprite, opts)
 
 }
-
 
 // Barrier
 type Barrier struct {
