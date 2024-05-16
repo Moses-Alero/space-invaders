@@ -9,7 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//go:embed *
+//go:embed assets
 var asset embed.FS
 
 var PlayerSprite = LoadAsset("assets/Player/Player_Ship_Ant_00.png")
