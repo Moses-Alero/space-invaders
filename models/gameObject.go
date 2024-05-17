@@ -15,8 +15,8 @@ import (
 type Space struct {
 	Position Vector
 	Size     Vector
-	index    int
-	objects  map[string]*GameObjectModel
+	Index    int
+	Objects  map[string]*GameObjectModel
 }
 
 
@@ -55,23 +55,23 @@ func (gom *GameObjectModel) SetCurrentSpacePosition(s *Space) {
 	if overlap {
 		//fmt.Println(gom.Name, "current world space index is -> ", space.index)
 		gom.currentWorldSpace = space
-		space.objects[gom.Name] = gom
+		space.Objects[gom.Name] = gom
 	} else {
 		//check if player was in space then remove player from space
-		if _, ok := space.objects[gom.Name]; ok {
-			delete(space.objects, gom.Name)
+		if _, ok := space.Objects[gom.Name]; ok {
+			delete(space.Objects, gom.Name)
 		}
 	}
 }
 
 func (gom *GameObjectModel) CheckCollision(cb func()) {
-	if len(gom.currentWorldSpace.objects) < 2 {
+	if len(gom.currentWorldSpace.Objects) < 2 {
 		return
 	}
-	for _, object := range gom.currentWorldSpace.objects {
+	for _, object := range gom.currentWorldSpace.Objects {
 		if object.Name != gom.Name {
 			if IsColliding(gom, object) {
-				fmt.Println(len(gom.currentWorldSpace.objects))
+				fmt.Println(len(gom.currentWorldSpace.Objects))
 				fmt.Println(gom.Name, " Collided with ", object.Name, " at ", time.Now().String())
 				cb()
 			}
@@ -99,34 +99,7 @@ func (gom *GameObjectModel) GetCenter() Vector {
 
 
 
-func CreateSpacePartition(worldSize Vector, row, col int) []*Space {
-	rowSize := int(worldSize.X) / row
-	colSize := int(worldSize.Y) / col
-	spaces := []*Space{}
-	size := Vector{
-		X: float64(rowSize),
-		Y: float64(colSize),
-	}
 
-	//partition
-	for x := 0; x < row; x++ {
-		for y := 0; y < col; y++ {
-			position := Vector{
-				X: float64(x * rowSize),
-				Y: float64(y * colSize),
-			}
-			space := &Space{
-				Position: position,
-				Size:     size,
-				index:    x*col + y,
-				objects:  make(map[string]*GameObjectModel),
-			}
-			spaces = append(spaces, space)
-		}
-	}
-
-	return spaces
-}
 
 func DrawPosition(screen *ebiten.Image, spaces []*Space, object *GameObjectModel, color color.Color) {
 	for _, s := range spaces {

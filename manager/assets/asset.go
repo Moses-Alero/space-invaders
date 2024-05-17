@@ -1,4 +1,4 @@
-package main
+package assets
 
 import (
 	"embed"
@@ -9,12 +9,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//go:embed assets
+//go:embed "all:game-assets" 
 var asset embed.FS
 
-var PlayerSprite = LoadAsset("assets/Player/Player_Ship_Ant_00.png")
-var PlayerBulletSprite = LoadAsset("assets/Player/Player_Shot_27.png")
-var EnemySprite = LoadAsset("assets/Enemy/Enemy_Ship_Scout_21.png")
+var PlayerSprite = LoadAsset("game-assets/Player/Player_Ship_Ant_00.png")
+var PlayerBulletSprite = LoadAsset("game-assets/Player/Player_Shot_27.png")
+var EnemySprite = LoadAsset("game-assets/Enemy/Enemy_Ship_Scout_21.png")
 
 func LoadAsset(path string) *ebiten.Image {
 	//read the file

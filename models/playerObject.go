@@ -19,9 +19,10 @@ type Player struct {
 	Health         int
 	AttackTimer    *utils.Timer
 	AttackCoolDown time.Duration
+	Name            string
 }
 
-func (p *Player) movement() {
+func (p *Player) Movement() {
 	var delta Vector
 
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
@@ -42,7 +43,7 @@ func (p *Player) movement() {
 
 	//check for diagonal movement
 	if delta.X != 0 && delta.Y != 0 {
-		factor := float64(speed) / math.Sqrt(math.Pow(delta.X, 2)+math.Pow(delta.Y, 2))
+		factor := float64(speed) / math.Sqrt(math.Pow(delta.X, 2) + math.Pow(delta.Y, 2))
 		delta.X *= factor
 		delta.Y *= factor
 	}
@@ -52,7 +53,7 @@ func (p *Player) movement() {
 
 }
 
-func (p *Player) attack() {
+func (p *Player) Attack() {
 	p.AttackTimer.Update()
 
 	if p.AttackTimer.IsReady() && ebiten.IsKeyPressed(ebiten.KeySpace) {
@@ -62,8 +63,8 @@ func (p *Player) attack() {
 }
 
 func (p *Player) Controls() {
-	p.movement()
-	p.attack()
+	p.Movement()
+	p.Attack()
 }
 
 func (p *Player) SpawnBullet() {
