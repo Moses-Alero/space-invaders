@@ -8,8 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	
-
-
 )
 
 type Space struct {
@@ -32,8 +30,8 @@ type GameObject interface {
 type GameObjectModel struct {
 	Name              string
 	Position          Vector
-	Sprite            *ebiten.Image
-	currentWorldSpace *Space
+	Sprite            ebiten.Image
+	CurrentWorldSpace *Space
 }
 
 func (gom *GameObjectModel) SetPosition(x float64, y float64) {
@@ -52,28 +50,33 @@ func (gom *GameObjectModel) GetSize() Vector {
 
 func (gom *GameObjectModel) SetCurrentSpacePosition(s *Space) {
 	overlap, space := IsOverlapping(gom, s)
+	if gom.Position.Y > 599 || gom.Position.X > 599 ||
+	gom.Position.Y < 0 || gom.Position.X < 0 {
+		delete(gom.CurrentWorldSpace.Objects, gom.Name)
+		return
+	}
 	if overlap {
-		//fmt.Println(gom.Name, "current world space index is -> ", space.index)
-		gom.currentWorldSpace = space
+		gom.CurrentWorldSpace = space
 		space.Objects[gom.Name] = gom
 	} else {
 		//check if player was in space then remove player from space
-		if _, ok := space.Objects[gom.Name]; ok {
+		_, ok := space.Objects[gom.Name]; 
+		if ok && gom.CurrentWorldSpace != space {
 			delete(space.Objects, gom.Name)
+			return
 		}
 	}
 }
 
-func (gom *GameObjectModel) CheckCollision(cb func()) {
-	if len(gom.currentWorldSpace.Objects) < 2 {
+func (gom *GameObjectModel) CheckCollision(cb func(collider *GameObjectModel)) {
+	if len(gom.CurrentWorldSpace.Objects) < 2 {
 		return
 	}
-	for _, object := range gom.currentWorldSpace.Objects {
+	for _, object := range gom.CurrentWorldSpace.Objects {
 		if object.Name != gom.Name {
 			if IsColliding(gom, object) {
-				fmt.Println(len(gom.currentWorldSpace.Objects))
 				fmt.Println(gom.Name, " Collided with ", object.Name, " at ", time.Now().String())
-				cb()
+				cb(object)
 			}
 		}
 	}
@@ -81,13 +84,19 @@ func (gom *GameObjectModel) CheckCollision(cb func()) {
 
 func (gom *GameObjectModel) Draw(screen *ebiten.Image) {
 	opts := &ebiten.DrawImageOptions{}
-	//opts.GeoM.Scale(2, 2)
+	opts.GeoM.Scale(2, 2)
 	opts.GeoM.Translate(gom.Position.X, gom.Position.Y)
 
-	//	drawPosition(screen, spaces, gom, color.RGBA{0,255,0,0})
+	//drawPosition(screen, spaces, gom, color.RGBA{0,255,0,0})
 
-	screen.DrawImage(gom.Sprite, opts)
+	screen.DrawImage(&gom.Sprite, opts)
 
+}
+
+func (gom *GameObjectModel) Destroy(){
+	delete(gom.CurrentWorldSpace.Objects, gom.Name)
+	gom = nil
+	return
 }
 
 func (gom *GameObjectModel) GetCenter() Vector {
@@ -97,6 +106,14 @@ func (gom *GameObjectModel) GetCenter() Vector {
 	}
 }
 
+
+func (gom *GameObjectModel) Spawn(pos Vector) GameObjectModel {
+	vec := Vector{ X: pos.X,Y: pos.Y }
+	return GameObjectModel{
+		Position: vec, 
+	 	Sprite: gom.Sprite,
+	}
+}
 
 
 

@@ -1,12 +1,13 @@
 package models
 
-import(
-	"time"
+import (
 	"fmt"
 	"math"
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 
- 	"github.com/Moses-Alero/space-invaders/utils"
+	"github.com/Moses-Alero/space-invaders/utils"
 )
 
 
@@ -19,7 +20,6 @@ type Player struct {
 	Health         int
 	AttackTimer    *utils.Timer
 	AttackCoolDown time.Duration
-	Name            string
 }
 
 func (p *Player) Movement() {
@@ -68,15 +68,17 @@ func (p *Player) Controls() {
 }
 
 func (p *Player) SpawnBullet() {
+	p.Bullet.Speed = 300 / ebiten.TPS()
 	spawnPosRight := Vector{
 		X: p.GetCenter().X,
 		Y: p.GetCenter().Y - 20,
 	}
 
-	bulletR := p.Bullet.Spawn(spawnPosRight)
-	bulletR.Name = fmt.Sprintf("Bullet%v", len(p.Bullets))
-	bulletR.Speed = 300 / ebiten.TPS()
-	p.Bullets = append(p.Bullets, &bulletR)
+	bRModel := p.Bullet.Spawn(spawnPosRight)
+	bRModel.Name = fmt.Sprintf("Bullet%v", len(p.Bullets))
+	bR := p.Bullet.New()
+	bR.GameObjectModel = bRModel
+	p.Bullets = append(p.Bullets, &bR)
 
 }
 

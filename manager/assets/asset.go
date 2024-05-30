@@ -16,7 +16,7 @@ var PlayerSprite = LoadAsset("game-assets/Player/Player_Ship_Ant_00.png")
 var PlayerBulletSprite = LoadAsset("game-assets/Player/Player_Shot_27.png")
 var EnemySprite = LoadAsset("game-assets/Enemy/Enemy_Ship_Scout_21.png")
 
-func LoadAsset(path string) *ebiten.Image {
+func LoadAsset(path string) ebiten.Image {
 	//read the file
 	f, err := asset.Open(path)
 	if err != nil {
@@ -31,5 +31,5 @@ func LoadAsset(path string) *ebiten.Image {
 		log.Fatal(err)
 	}
 
-	return ebiten.NewImageFromImage(img)
+	return *ebiten.NewImageFromImage(img)
 }

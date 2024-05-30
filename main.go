@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Moses-Alero/space-invaders/enemy"
 	"github.com/Moses-Alero/space-invaders/models"
 	"github.com/Moses-Alero/space-invaders/player"
 	"github.com/Moses-Alero/space-invaders/utils"
@@ -16,13 +17,11 @@ const (
 	gridRowSize, gridColSize = 4, 4
 )
 
-var playerStartPos = models.Vector{float64(screenX/2) + 50, float64(screenY/2) + 50}
-var enemyStartPos = models.Vector{float64(screenX / 3), float64(screenY / 3)}
-
-
-
+var playerStartPos = models.Vector{X: float64(screenX/2) + 50, Y: float64(screenY/2) + 50}
+var enemyStartPos = models.Vector{X: float64(screenX / 3), Y: float64(screenY / 3)}
 
 var p *models.Player
+var e *models.Enemy
 
 var spaces []*models.Space
 var world models.Vector = models.Vector{
@@ -33,25 +32,31 @@ var world models.Vector = models.Vector{
 type Game struct {
 }
 
+func setup() {
+	p = player.New()
+	e = enemy.New()
+
+	p.Position = playerStartPos
+	e.Position = enemyStartPos
+
+}
 
 func (g *Game) Update() error {
 	player.Update(p, spaces)
-	return nil
-}
+	enemy.Update(e, spaces)
 
-func setup (){
-	p = player.New()	
-	
+	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	// So basically wo i put items we want to draw on the sreen in this area and
 	// the items are drawn in a desecding order as they are placed
 	player.Draw(screen, p)
+
 	utils.DrawGrid(screen, gridRowSize, gridColSize, screenY, screenX)
-	
+	enemy.Draw(screen, e)
 	for _, s := range spaces {
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("POS: %v, %v", s.Position.X, s.Position.Y), int(s.Position.X), int(s.Position.Y))
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%v", len(s.Objects)), int(s.Position.X), int(s.Position.Y))
 	}
 
 	//ebitenutil.DebugPrintAt(screen, fmt.Sprintf("."), int(ship.Position.X), int(ship.Position.Y))
@@ -63,8 +68,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func main() {
 	ebiten.SetWindowSize(screenX, screenY)
-	//ebiten.SetWindowResizable(true)
-	ebiten.SetWindowResizingMode(ebiten.WindowResizingMode() + 1)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingMode())
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeOnlyFullscreenEnabled)
 	ebiten.SetWindowTitle("Space Invaders")
 

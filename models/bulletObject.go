@@ -6,20 +6,10 @@ type Bullet struct {
 	Damage int
 }
 
-func (b *Bullet) Spawn(pos Vector) Bullet {
-	b.Position = Vector{
-		X: pos.X,
-		Y: pos.Y,
+func (b *Bullet) New() Bullet{
+	return Bullet{
+		Speed: b.Speed,
 	}
-
-	gom := GameObjectModel{
-		Position: b.Position,
-		Sprite:   b.Sprite,
-	}
-
-	bullet := new(Bullet)
-	bullet.GameObjectModel = gom
-	return *bullet
 }
 
 func (b *Bullet) Fire() {
